@@ -1,10 +1,24 @@
 #!/bin/bash
-set -e  # stop on error
-
-# Ensure HOME is set
+set -e
 export HOME=/home/ubuntu
 
+echo "✅ Connected via SSM (Frontend)!"
 
-sudo rm -rf /var/www/html/myapp/build/* || true
-sudo mkdir -p /var/www/html/myapp/build
-sudo cp -r /home/ubuntu/Builds/Main/FrontBuild/* /var/www/html/myapp/build
+# Fix Git ownership warning
+git config --global --add safe.directory /home/ubuntu/Projects/app-folder
+
+cd /home/ubuntu/Projects/app-folder
+
+# Pull latest code (use HTTPS if repo is private)
+git pull origin main
+
+# Install dependencies, ignoring post-install scripts
+npm install --ignore-scripts
+
+# Build the frontend
+npm run build
+
+# Reload or start PM2 process
+pm2 reload "my-app"
+
+echo "🚀 Frontend deployment completed successfully!"
